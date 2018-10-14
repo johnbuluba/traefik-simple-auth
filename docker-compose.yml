@@ -5,16 +5,29 @@ services:
   # The reverse proxy service (Træfik)
   traefik:
     image: traefik  # The official Traefik docker image
-    command: --api --docker  --logLevel=DEBUG # Enables the web UI and tells Træfik to listen to docker
+    command: --api --docker  --logLevel=INFO # Enables the web UI and tells Træfik to listen to docker
     ports:
       - "80:80"      # The HTTP port
       - "8080:8080"  # The Web UI (enabled by --api)
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock  # So that Traefik can listen to the Docker events
 
+  db:
+    image: postgres:9.6.5-alpine
+    environment:
+      POSTGRES_DB: traefikauth
+      POSTGRES_USER: traefikauth
+      POSTGRES_PASSWORD: traefikauth
+    volumes:
+    - db_data:/var/lib/postgresql/data
+
   auth:
     image: buluba89/traefik-simple-auth
     build: ./
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgres://traefikauth:traefikauth@db:5432/traefikauth
     labels:
       - "traefik.frontend.rule=Host:auth.docker.localhost"
 
@@ -25,4 +38,6 @@ services:
     labels:
       - "traefik.frontend.rule=Host:whoami.docker.localhost"
       - "traefik.frontend.auth.forward.address=http://auth.docker.localhost/auth/"
-      - "traefik.frontend.auth.headerField=Set-Cookie"
+
+volumes:
+  db_data:
