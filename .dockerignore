@@ -1,0 +1,8 @@
+.cache
+.tox
+.tx
+__pycache__
+*.pyc
+
+**/.idea
+**/db.sqlite3
