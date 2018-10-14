@@ -1,6 +1,6 @@
 FROM python:3.7-alpine3.8
 
-RUN apk add postgresql-dev gcc python3-dev musl-dev
+RUN apk add --no-cache postgresql-dev gcc python3-dev musl-dev
 
 RUN mkdir /traefikauth &&\
     pip3 install pipenv

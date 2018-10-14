@@ -28,6 +28,7 @@ services:
       - db
     environment:
       DATABASE_URL: postgres://traefikauth:traefikauth@db:5432/traefikauth
+      DOMAINS: .docker.localhost
     labels:
       - "traefik.frontend.rule=Host:auth.docker.localhost"
 
