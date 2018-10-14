@@ -15,4 +15,5 @@ ADD traefikauth /traefikauth/traefikauth
 
 EXPOSE 8000
 
+ENV DJANGO_SETTINGS_MODULE traefikauth.settings.docker
 CMD ["/traefikauth/deploy/start.sh"]

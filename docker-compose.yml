@@ -1,17 +1,28 @@
+version: '3'
+
 services:
-  
+
   # The reverse proxy service (Træfik)
   traefik:
     image: traefik  # The official Traefik docker image
-    command: --api --docker  # Enables the web UI and tells Træfik to listen to docker
+    command: --api --docker  --logLevel=DEBUG # Enables the web UI and tells Træfik to listen to docker
     ports:
       - "80:80"      # The HTTP port
       - "8080:8080"  # The Web UI (enabled by --api)
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock  # So that Traefik can listen to the Docker events
 
+  auth:
+    image: buluba89/traefik-simple-auth
+    build: ./
+    labels:
+      - "traefik.frontend.rule=Host:auth.docker.localhost"
+
+
   # A container that exposes a simple API
   whoami:
     image: emilevauge/whoami  # A container that exposes an API to show it's IP address
     labels:
       - "traefik.frontend.rule=Host:whoami.docker.localhost"
+      - "traefik.frontend.auth.forward.address=http://auth.docker.localhost/auth/"
+      - "traefik.frontend.auth.headerField=Set-Cookie"
